@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
-public class PlayerFollow : MonoBehaviour {
+public class CameraBehaviour : MonoBehaviour {
 
 	private float _distance = 12f;
     private Quaternion _rot;
@@ -14,7 +15,14 @@ public class PlayerFollow : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
+	    var billboards = GameObject.FindGameObjectsWithTag("Billboard");
+	    foreach (var b in billboards)
+	    {
+	        b.transform.rotation = transform.rotation;
+	    }
+
 		var pos = _target.transform.position;
 		pos.x -= _distance;
 		pos.z -= _distance;

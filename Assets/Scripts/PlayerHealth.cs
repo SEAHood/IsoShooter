@@ -39,7 +39,7 @@ public class PlayerHealth : NetworkBehaviour
 
     public bool IsFullHealth()
     {
-        return Mathf.Approximately(_currentHealth, StartingHealth)
+        return Mathf.Approximately(_currentHealth, StartingHealth);
     }
 
     private void Respawn()

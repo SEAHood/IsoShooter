@@ -28,7 +28,9 @@ public class HealthpackBehaviour : NetworkBehaviour
         if (_isRespawning) return;
         if (other.tag == "Player")
         {
-            other.GetComponentInParent<PlayerHealth>().Heal(HealthAmount);
+            var playerHealth = other.GetComponentInParent<PlayerHealth>();
+            if (playerHealth.IsFullHealth() || !playerHealth.IsAlive()) return;
+            playerHealth.Heal(HealthAmount);
             _isRespawning = true;
             _respawnTimer = 0f;
             RpcCollected();
@@ -54,6 +56,7 @@ public class HealthpackBehaviour : NetworkBehaviour
     {
         Debug.Log("Healthpack collected");
         transform.Find("Graphics").gameObject.SetActive(false);
+        transform.Find("CollectEffect").GetComponent<ParticleSystem>().Play();
         // todo
         /*var meshRenderers = GetComponentsInChildren<MeshRenderer>();
         foreach (var mr in meshRenderers)

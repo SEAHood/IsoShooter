@@ -70,7 +70,7 @@ public class PlayerShooting : NetworkBehaviour {
         {
             var enemyHealth = shootHit.collider.GetComponent<PlayerHealth>();
             if (enemyHealth != null)
-                enemyHealth.TakeDamage(DamagePerShot);
+                enemyHealth.TakeDamage(DamagePerShot, gameObject);
         }
 
         var bullet = Instantiate(Bullet.gameObject, _bulletSpawnPosition.position, transform.rotation);

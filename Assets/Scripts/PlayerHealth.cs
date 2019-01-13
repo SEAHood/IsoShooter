@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using Random = System.Random;
 
 
 public class PlayerHealth : NetworkBehaviour
@@ -29,12 +30,16 @@ public class PlayerHealth : NetworkBehaviour
         _playerShooting = GetComponent<PlayerShooting>();
         _currentHealth = StartingHealth;
     }
-
-
+    
     void Update ()
     {
         if (isLocalPlayer && !GetComponent<PlayerHealth>().IsAlive() && Input.GetKeyDown(KeyCode.R))
             Respawn();
+    }
+
+    public bool IsFullHealth()
+    {
+        return Mathf.Approximately(_currentHealth, StartingHealth)
     }
 
     private void Respawn()
@@ -56,9 +61,15 @@ public class PlayerHealth : NetworkBehaviour
     {
         _isDead = false;
         _currentHealth = 100;
-        var respawnPos = Vector3.zero;
+
+        var spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+        var point = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)];
+        var respawnPos = point.transform.position;
         respawnPos.y = 1;
         transform.position = respawnPos;
+
+        //Random.Range(1, 1);
+        //NetworkServer.Spawn(gameObject);
     }
     
     public void Heal(float amount)
@@ -68,22 +79,26 @@ public class PlayerHealth : NetworkBehaviour
     }
 
     // Todo: investigate whether or not i need to do the whole rpc / cmd shit
-    public void TakeDamage(int amount)
+    public bool TakeDamage(int amount, GameObject shooter) // Returns if it was a kill shot
     {
+        var oldHealth = _currentHealth;
+
         if (isServer)
-            RpcTakeDamage(amount);
+            RpcTakeDamage(amount, shooter);
         else
-            CmdTakeDamage(amount);
+            CmdTakeDamage(amount, shooter);
+
+        return oldHealth > 0 && _isDead;
     }
 
     [Command]
-    public void CmdTakeDamage(int amount)
+    public void CmdTakeDamage(int amount, GameObject shooter)
     {
-        RpcTakeDamage(amount);
+        RpcTakeDamage(amount, shooter);
     }
 
     [ClientRpc]
-    private void RpcTakeDamage(int amount)
+    private void RpcTakeDamage(int amount, GameObject shooter)
     {
         if (_isDead) return;
 
@@ -91,7 +106,11 @@ public class PlayerHealth : NetworkBehaviour
         _currentHealth = newHealth > 0 ? newHealth : 0;
 
         if (_currentHealth <= 0 && !_isDead)
+        {
             _isDead = true;
+            if (shooter != null)
+                shooter.GetComponent<PlayerScore>().GrantPoints(1);
+        }
     }
 
     private void UpdateHealth(float newHealth)
@@ -110,6 +129,7 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             transform.Find("UI/Dead").GetComponent<Text>().enabled = isNowDead;
+            transform.Find("UI/Respawn").GetComponent<Text>().enabled = isNowDead;
 
             if (isNowDead)
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;

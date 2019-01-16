@@ -13,7 +13,9 @@ public class PlayerHealth : NetworkBehaviour
     public Image HealthBar;
     public GameObject ImpactEffect;
     public GameObject ImpactExitEffect;
-    
+    public GameObject DeathEffect;
+
+
     private PlayerMovement _playerMovement;
     private PlayerShooting _playerShooting;
 
@@ -68,6 +70,8 @@ public class PlayerHealth : NetworkBehaviour
         respawnPos.y = 1;
         transform.position = respawnPos;
 
+        transform.Find("Player").gameObject.SetActive(true);
+        transform.Find("FloatUI").gameObject.SetActive(true);
         //Random.Range(1, 1);
         //NetworkServer.Spawn(gameObject);
     }
@@ -78,16 +82,26 @@ public class PlayerHealth : NetworkBehaviour
         _currentHealth = newHealth >= 100 ? 100 : newHealth;
     }
 
+    private IEnumerator DeathCoroutine()
+    {
+        transform.Find("FloatUI").gameObject.SetActive(false);
+        yield return new WaitForSeconds(1.5f);
+        var deathEffect = Instantiate(DeathEffect, transform.position, DeathEffect.transform.rotation);
+        NetworkServer.Spawn(deathEffect);
+        transform.Find("Player").gameObject.SetActive(false);
+    }
+
     // Todo: investigate whether or not i need to do the whole rpc / cmd shit
     public bool TakeDamage(int amount, GameObject shooter) // Returns if it was a kill shot
     {
+        if (_isDead) return false;
         var oldHealth = _currentHealth;
 
         if (isServer)
             RpcTakeDamage(amount, shooter);
         else
             CmdTakeDamage(amount, shooter);
-
+        
         return oldHealth > 0 && _isDead;
     }
 
@@ -110,6 +124,8 @@ public class PlayerHealth : NetworkBehaviour
             _isDead = true;
             if (shooter != null)
                 shooter.GetComponent<PlayerScore>().GrantPoints(1);
+
+            StartCoroutine("DeathCoroutine");
         }
     }
 

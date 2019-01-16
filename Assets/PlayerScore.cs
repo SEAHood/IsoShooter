@@ -13,7 +13,6 @@ public class PlayerScore : NetworkBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-	    CurrentScore = 0;
 	}
 
     public void GrantPoints(int points)
@@ -25,5 +24,11 @@ public class PlayerScore : NetworkBehaviour
     public void OnScoreChange(int newScore)
     {
         transform.Find("FloatUI/Score").gameObject.GetComponent<Text>().text = newScore.ToString();
+        transform.Find("UI/TabPanel").GetComponent<TabBehaviour>().AddOrUpdateScore(GetComponent<Player>().PlayerName ?? "Unknown", newScore);
+
+        if (isLocalPlayer)
+        {
+            // do something
+        }
     }
 }

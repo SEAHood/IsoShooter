@@ -56,7 +56,7 @@ public class HealthpackBehaviour : NetworkBehaviour
     {
         Debug.Log("Healthpack collected");
         transform.Find("Graphics").gameObject.SetActive(false);
-        transform.Find("CollectEffect").GetComponent<ParticleSystem>().Play();
+        transform.Find("HealthPickup").GetComponent<ParticleSystem>().Play();
         // todo
         /*var meshRenderers = GetComponentsInChildren<MeshRenderer>();
         foreach (var mr in meshRenderers)

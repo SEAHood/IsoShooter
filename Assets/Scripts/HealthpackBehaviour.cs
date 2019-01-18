@@ -57,6 +57,7 @@ public class HealthpackBehaviour : NetworkBehaviour
         Debug.Log("Healthpack collected");
         transform.Find("Graphics").gameObject.SetActive(false);
         transform.Find("HealthPickup").GetComponent<ParticleSystem>().Play();
+        transform.Find("PickupSfx").GetComponent<AudioSource>().Play();
         // todo
         /*var meshRenderers = GetComponentsInChildren<MeshRenderer>();
         foreach (var mr in meshRenderers)

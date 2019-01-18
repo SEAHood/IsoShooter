@@ -16,13 +16,18 @@ public class MenuItemHandler : MonoBehaviour, IPointerClickHandler, IPointerEnte
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_fullMenu.OptionSelected) return;
-        _fullMenu.OptionSelected = true;
+        _fullMenu.SelectOption();
 
         switch (gameObject.name)
         {
             case "Play":
-                GameObject.Find("Mine").GetComponent<MineBehaviour>().Trigger();
-                Initiate.Fade("ArenaMode", Color.black, 0.5f);
+                //Initiate.Fade("ArenaMode", Color.black, 0.5f);
+                Initiate.Fade("Lobby", Color.black, 0.5f);
+                break;
+            case "Host":
+                GameObject.Find("NetworkManager").GetComponent<LobbyManager>().HostGame();
+                //CrossScene.HostingGame = true;
+                //Initiate.Fade("Lobby", Color.black, 0.5f);
                 break;
             case "Quit":
                 Application.Quit();

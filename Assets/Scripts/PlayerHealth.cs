@@ -72,6 +72,7 @@ public class PlayerHealth : NetworkBehaviour
 
         transform.Find("Player").gameObject.SetActive(true);
         transform.Find("FloatUI").gameObject.SetActive(true);
+        GetComponent<BoxCollider>().enabled = true;
         //Random.Range(1, 1);
         //NetworkServer.Spawn(gameObject);
     }
@@ -88,6 +89,8 @@ public class PlayerHealth : NetworkBehaviour
         yield return new WaitForSeconds(1.5f);
         var deathEffect = Instantiate(DeathEffect, transform.position, DeathEffect.transform.rotation);
         NetworkServer.Spawn(deathEffect);
+        GetComponent<BoxCollider>().enabled = false;
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         transform.Find("Player").gameObject.SetActive(false);
     }
 
@@ -138,7 +141,8 @@ public class PlayerHealth : NetworkBehaviour
 
     private void UpdateDead(bool isNowDead)
     {
-        transform.Find("Player/Torch").gameObject.GetComponent<Light>().enabled = !isNowDead; //todo
+        gameObject.layer = isNowDead ? LayerMask.NameToLayer("Default") : LayerMask.NameToLayer("Shootable");
+        transform.Find("Player/Torch").gameObject.GetComponent<Light>().enabled = !isNowDead; 
         _playerMovement.Enabled = !isNowDead;
         _playerShooting.Enabled = !isNowDead;
 

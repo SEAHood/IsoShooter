@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class PlayerShooting : NetworkBehaviour {
 	public int DamagePerShot = 20;
-	public float TimeBetweenBullets = 0.15f;
+	public float TimeBetweenBullets = 0.1f;
 	public float Range = 100f;
     public bool Enabled = true;
     public GameObject Bullet;
@@ -40,7 +40,7 @@ public class PlayerShooting : NetworkBehaviour {
         if (!Enabled) return;
         if (!GetComponent<PlayerHealth>().IsAlive()) return;
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && _timer >= TimeBetweenBullets)
+        if (Input.GetKey(KeyCode.Mouse0) && _timer >= TimeBetweenBullets)
         {
             PlayerUi.transform.Find("Bang").GetComponent<Text>().enabled = true;
             Shoot();

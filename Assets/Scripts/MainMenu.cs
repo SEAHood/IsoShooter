@@ -11,6 +11,8 @@ public class MainMenu : MonoBehaviour {
     public GameObject ExplosionFx;
     public Transform ExplosionTransform;
 
+    private bool _mineExploded;
+
     void Start()
     {
         PlayButton.onClick.AddListener(OnClickPlay);
@@ -29,8 +31,12 @@ public class MainMenu : MonoBehaviour {
     {
         if (string.IsNullOrEmpty(NameInput.text)) return;
 
-        Instantiate(ExplosionFx, ExplosionTransform.position, Quaternion.identity);
-        GameObject.Find("Mine/MineAudio").GetComponent<AudioSource>().Play();
+        if (!_mineExploded)
+        {
+            Instantiate(ExplosionFx, ExplosionTransform.position, Quaternion.identity);
+            GameObject.Find("Mine/MineAudio").GetComponent<AudioSource>().Play();
+            _mineExploded = true;
+        }
 
         CrossScene.PlayerName = NameInput.text;
         Initiate.Fade("Lobby", Color.black, 0.5f);

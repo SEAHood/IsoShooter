@@ -11,7 +11,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
     static List<int> _colorInUse = new List<int>();
 
     //public Button ColorButton;
-    //public InputField NameInput;
+    public Text NameText;
     public Button ReadyButton;
     //public Button WaitingPlayerButton;
     //public Button RemovePlayerButton;
@@ -41,8 +41,11 @@ public class LobbyPlayer : NetworkLobbyPlayer
         base.OnClientEnterLobby();
 
 
-        if (LobbyManager.Singleton != null) LobbyManager.Singleton.OnPlayersNumberModified(1);
-
+        if (LobbyManager.Singleton != null)
+        {
+            LobbyManager.Singleton.SetServerInfo("Connected", LobbyManager.Singleton.networkAddress);
+            LobbyManager.Singleton.OnPlayersNumberModified(1);
+        }
         LobbyPlayerList.Instance.AddPlayer(this);
         LobbyPlayerList.Instance.DisplayDirectServerWarning(isServer && LobbyManager.Singleton.matchMaker == null);
 
@@ -86,10 +89,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //NameInput.interactable = false;
         //RemovePlayerButton.interactable = NetworkServer.active;
 
-        ChangeReadyButtonColor(_notReadyColor);
+        ChangeReadyButtonColor(_transparentColor);
 
         //ReadyButton.transform.GetChild(0).GetComponent<Text>().text = "...";
-        //ReadyButton.interactable = false;
+        ReadyButton.interactable = false;
 
         OnClientReady(false);
     }
@@ -100,19 +103,20 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //RemoteIcone.gameObject.SetActive(false);
         //LocalIcone.gameObject.SetActive(true);
 
-        CheckRemoveButton();
+        //CheckRemoveButton();
 
-        if (PlayerColor == Color.white)
-            CmdColorChange();
+        //if (PlayerColor == Color.white)
+        //    CmdColorChange();
 
-        ChangeReadyButtonColor(_joinColor);
+        //ChangeReadyButtonColor(_joinColor);
+        ChangeReadyButtonColor(_notReadyColor);
 
         //ReadyButton.transform.GetChild(0).GetComponent<Text>().text = "JOIN";
-       // ReadyButton.interactable = true;
+        ReadyButton.interactable = true;
 
         //have to use child count of player prefab already setup as "this.slot" is not set yet
-        if (PlayerName == "")
-            CmdNameChanged("Player" + (LobbyPlayerList.Instance.PlayerListContentTransform.childCount - 1));
+        //if (PlayerName == "")
+        //    CmdNameChanged("Player" + (LobbyPlayerList.Instance.PlayerListContentTransform.childCount - 1));
 
         //we switch from simple name display to name input
         //ColorButton.interactable = true;
@@ -124,8 +128,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //ColorButton.onClick.RemoveAllListeners();
         //ColorButton.onClick.AddListener(OnColorClicked);
 
-        //ReadyButton.onClick.RemoveAllListeners();
-        //ReadyButton.onClick.AddListener(OnReadyClicked);
+        CmdNameChanged(CrossScene.PlayerName);
+
+        ReadyButton.onClick.RemoveAllListeners();
+        ReadyButton.onClick.AddListener(OnReadyClicked);
 
         //when OnClientEnterLobby is called, the loval PlayerController is not yet created, so we need to redo that here to disable
         //the add button if we reach maxLocalPlayer. We pass 0, as it was already counted on OnClientEnterLobby
@@ -149,23 +155,25 @@ public class LobbyPlayer : NetworkLobbyPlayer
     {
         if (readyState)
         {
-            ChangeReadyButtonColor(_transparentColor);
+            //ChangeReadyButtonColor(_transparentColor);
+            ChangeReadyButtonColor(_readyColor);
 
             //Text textComponent = ReadyButton.transform.GetChild(0).GetComponent<Text>();
             //textComponent.text = "READY";
-            //textComponent.color = _readyColor;
-            //ReadyButton.interactable = false;
+           // textComponent.color = _readyColor;
+            ReadyButton.interactable = false;
             //ColorButton.interactable = false;
             //NameInput.interactable = false;
         }
         else
         {
-            ChangeReadyButtonColor(isLocalPlayer ? _joinColor : _notReadyColor);
+            ChangeReadyButtonColor(isLocalPlayer ? _notReadyColor : _transparentColor);
+            //ChangeReadyButtonColor(_notReadyColor);
 
             //Text textComponent = ReadyButton.transform.GetChild(0).GetComponent<Text>();
             //textComponent.text = isLocalPlayer ? "JOIN" : "...";
             //textComponent.color = Color.white;
-            //ReadyButton.interactable = isLocalPlayer;
+            ReadyButton.interactable = isLocalPlayer;
             //ColorButton.interactable = isLocalPlayer;
             //NameInput.interactable = isLocalPlayer;
         }
@@ -181,12 +189,13 @@ public class LobbyPlayer : NetworkLobbyPlayer
     public void OnMyName(string newName)
     {
         PlayerName = newName;
-        //NameInput.text = PlayerName;
+        NameText.text = PlayerName;
     }
 
     public void OnMyColor(Color newColor)
     {
         PlayerColor = newColor;
+        NameText.color = newColor;
         //ColorButton.GetComponent<Image>().color = newColor;
     }
 
@@ -222,7 +231,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
     public void ToggleJoinButton(bool enabled)
     {
-        //ReadyButton.gameObject.SetActive(enabled);
+        ReadyButton.gameObject.SetActive(enabled);
         //WaitingPlayerButton.gameObject.SetActive(!enabled);
     }
 

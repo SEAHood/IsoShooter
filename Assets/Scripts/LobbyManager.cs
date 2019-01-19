@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LobbyManager : NetworkLobbyManager
@@ -147,17 +148,42 @@ public class LobbyManager : NetworkLobbyManager
         }*/
     }
 
+
+    public override void OnLobbyServerPlayersReady()
+    {
+        //ChangeTo(null);
+        //transform.Find("UI").gameObject.SetActive(false);
+        Debug.Log("Everyone ready!");
+        base.OnLobbyServerPlayersReady();
+
+    }
+
+    public override void OnLobbyClientSceneChanged(NetworkConnection conn)
+    {
+        if (SceneManager.GetSceneAt(0).name == lobbyScene)
+        {
+            ChangeTo(MainMenuPanel);
+        }
+        else
+        {
+            ChangeTo(null);
+
+            //Destroy(GameObject.Find("MainMenuUI(Clone)"));
+        }
+    }
+
     public override GameObject OnLobbyServerCreateLobbyPlayer(NetworkConnection conn, short playerControllerId)
     {
-        GameObject obj = Instantiate(lobbyPlayerPrefab.gameObject) as GameObject;
+        var obj = Instantiate(lobbyPlayerPrefab.gameObject);
 
-        LobbyPlayer newPlayer = obj.GetComponent<LobbyPlayer>();
-        newPlayer.ToggleJoinButton(numPlayers + 1 >= minPlayers);
+        var newPlayer = obj.GetComponent<LobbyPlayer>();
+        //newPlayer.ToggleJoinButton(numPlayers + 1 >= minPlayers);
+        newPlayer.ToggleJoinButton(true);
 
 
-        for (int i = 0; i < lobbySlots.Length; ++i)
+        for (var i = 0; i < lobbySlots.Length; ++i)
         {
-            LobbyPlayer p = lobbySlots[i] as LobbyPlayer;
+            var p = lobbySlots[i] as LobbyPlayer;
 
             if (p != null)
             {

@@ -61,6 +61,9 @@ public class PlayerShooting : NetworkBehaviour {
     [Command]
     public void CmdShoot()
     {
+        if (_timer < TimeBetweenBullets) return;
+
+        Debug.Log("Shoot!");
         var shootRay = new Ray();
         RaycastHit shootHit;
         shootRay.origin = _bulletSpawnPosition.position;

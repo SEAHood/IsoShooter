@@ -53,13 +53,13 @@ public class LobbyPlayerList : MonoBehaviour
             return;
 
         Players.Add(player);
-        player.PlayerName = Guid.NewGuid().ToString().Substring(0, 5);
-        //player.transform.SetParent(PlayerListContentTransform, false);
+        //player.PlayerName = Guid.NewGuid().ToString().Substring(0, 5);
+        player.transform.SetParent(PlayerListContentTransform, false);
 
         //AddButtonRow.transform.SetAsLastSibling();
-        var row = Instantiate(PlayerRowPrefab, PlayerListContentTransform);
-        row.transform.Find("PlayerName").GetComponent<Text>().text = player.PlayerName;
-        row.transform.Find("PlayerReady").GetComponent<Image>().color = player.readyToBegin ? Color.green : Color.red;
+        //var row = Instantiate(PlayerRowPrefab, PlayerListContentTransform);
+        //row.transform.Find("PlayerName").GetComponent<Text>().text = player.PlayerName;
+        //row.transform.Find("PlayerReady").GetComponent<Image>().color = player.readyToBegin ? Color.green : Color.red;
 
         PlayerListModified();
     }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
@@ -19,12 +20,30 @@ public class MainMenu : MonoBehaviour {
         NameSelectButton.onClick.AddListener(OnClickNameSelect);
         QuitButton.onClick.AddListener(OnClickQuit);
     }
-    
+
+    void Update()
+    {
+
+    }
+
+
+    IEnumerator SlideInNameSelect()
+    {
+        const float slideDistance = -1295f;
+        var slidingMenu = transform.Find("SlidingMenu");
+        while (slidingMenu.transform.localPosition.x > slideDistance)
+        {
+            slidingMenu.transform.Translate(-50f * transform.localScale.x, 0, 0, Space.Self);
+            yield return null;
+        }
+
+    }
 
     void OnClickPlay()
     {
+        StartCoroutine(SlideInNameSelect());
         // Todo Lerp this so it slides
-        transform.Find("SlidingMenu").transform.Translate(-1295 * transform.localScale.x, 0, 0, Space.Self);
+        //transform.Find("SlidingMenu").transform.Translate(-1295 * transform.localScale.x, 0, 0, Space.Self);
     }
 
     void OnClickNameSelect()

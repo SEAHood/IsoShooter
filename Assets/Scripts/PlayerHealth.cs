@@ -1,18 +1,13 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
-using Random = System.Random;
 
 
 public class PlayerHealth : NetworkBehaviour
 {
     public float StartingHealth = 100f;
     public Image HealthBar;
-    public GameObject ImpactEffect;
-    public GameObject ImpactExitEffect;
     public GameObject DeathEffect;
 
 
@@ -61,6 +56,7 @@ public class PlayerHealth : NetworkBehaviour
     [ClientRpc]
     private void RpcRespawn()
     {
+
         _isDead = false;
         _currentHealth = 100;
 
@@ -69,12 +65,6 @@ public class PlayerHealth : NetworkBehaviour
         var respawnPos = point.transform.position;
         respawnPos.y = 1;
         transform.position = respawnPos;
-
-        transform.Find("Player").gameObject.SetActive(true);
-        transform.Find("FloatUI").gameObject.SetActive(true);
-        GetComponent<BoxCollider>().enabled = true;
-        //Random.Range(1, 1);
-        //NetworkServer.Spawn(gameObject);
     }
     
     public void Heal(float amount)
@@ -83,12 +73,40 @@ public class PlayerHealth : NetworkBehaviour
         _currentHealth = newHealth >= 100 ? 100 : newHealth;
     }
 
+    /*[Command]
+    public void CmdDeath()
+    {
+        StartCoroutine("DeathCoroutine");
+    }
+
     private IEnumerator DeathCoroutine()
     {
+        RpcDisableFloatUi();
+        yield return new WaitForSeconds(1.5f);
+        RpcDeath();
+    }
+
+    [ClientRpc]
+    private void RpcDisableFloatUi()
+    {
+        transform.Find("FloatUI").gameObject.SetActive(false);
+    }
+
+    [ClientRpc]
+    private void RpcDeath()
+    {
+        Instantiate(DeathEffect, transform.position, DeathEffect.transform.rotation);
+        GetComponent<BoxCollider>().enabled = false;
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+        transform.Find("Player").gameObject.SetActive(false);
+    }*/
+    
+    private IEnumerator DeathCoroutine()
+    {
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
         transform.Find("FloatUI").gameObject.SetActive(false);
         yield return new WaitForSeconds(1.5f);
-        var deathEffect = Instantiate(DeathEffect, transform.position, DeathEffect.transform.rotation);
-        NetworkServer.Spawn(deathEffect);
+        Instantiate(DeathEffect, transform.position, DeathEffect.transform.rotation);
         GetComponent<BoxCollider>().enabled = false;
         GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         transform.Find("Player").gameObject.SetActive(false);
@@ -104,7 +122,8 @@ public class PlayerHealth : NetworkBehaviour
             RpcTakeDamage(amount, shooter);
         else
             CmdTakeDamage(amount, shooter);
-        
+
+
         return oldHealth > 0 && _isDead;
     }
 
@@ -128,7 +147,8 @@ public class PlayerHealth : NetworkBehaviour
             if (shooter != null)
                 shooter.GetComponent<PlayerScore>().GrantPoints(1);
 
-            StartCoroutine("DeathCoroutine");
+            //if (_isDead)
+            //    CmdDeath();
         }
     }
 
@@ -146,15 +166,26 @@ public class PlayerHealth : NetworkBehaviour
         _playerMovement.Enabled = !isNowDead;
         _playerShooting.Enabled = !isNowDead;
 
+        if (isNowDead)
+            StartCoroutine(DeathCoroutine());
+        else
+        {
+            transform.Find("Player").gameObject.SetActive(true);
+            transform.Find("FloatUI").gameObject.SetActive(true);
+            GetComponent<BoxCollider>().enabled = true;
+            GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        }
+
         if (isLocalPlayer)
         {
             transform.Find("UI/Dead").GetComponent<Text>().enabled = isNowDead;
             transform.Find("UI/Respawn").GetComponent<Text>().enabled = isNowDead;
+/*
 
             if (isNowDead)
                 GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
             else
-                GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;*/
         }
     }
 

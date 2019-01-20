@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -21,6 +22,8 @@ public class LobbyManager : NetworkLobbyManager
     public RectTransform LobbyPanel;
     protected RectTransform CurrentPanel;
 
+    private LobbyHook _lobbyHook;
+
     //Client numPlayers from NetworkManager is always 0, so we count (throught connect/destroy in LobbyPlayer) the number
     //of players, so that even client know how many player there is.
     [HideInInspector]
@@ -30,6 +33,7 @@ public class LobbyManager : NetworkLobbyManager
     // Use this for initialization
     void Start()
     {
+        _lobbyHook = GetComponent<LobbyHook>();
         Singleton = this;
         CurrentPanel = MainMenuPanel;
         DontDestroyOnLoad(gameObject);
@@ -79,26 +83,7 @@ public class LobbyManager : NetworkLobbyManager
         //backDelegate = StopHostClbk;
         SetServerInfo("Hosting", networkAddress);
     }
-
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        //LobbyUi.GetComponent<PlayerListManager>().AddPlayer(conn);
-        base.OnClientConnect(conn);
-    }
-
-    public override void OnLobbyClientConnect(NetworkConnection conn)
-    {
-        //LobbyUi.GetComponent<PlayerListManager>().AddPlayer(conn);
-        base.OnLobbyClientConnect(conn);
-    }
-
-    /*public override void OnLobbyServerConnect(NetworkConnection conn)
-    {
-        LobbyUi.GetComponent<PlayerListManager>().AddPlayer(conn);
-        base.OnLobbyServerConnect(conn);
-    }*/
-
-
+    
     public void AddLocalPlayer()
     {
         TryToAddPlayer();
@@ -109,11 +94,23 @@ public class LobbyManager : NetworkLobbyManager
     {
         PlayerNumber += count;
 
-        int localPlayerCount = 0;
+        var localPlayerCount = 0;
         foreach (PlayerController p in ClientScene.localPlayers)
             localPlayerCount += (p == null || p.playerControllerId == -1) ? 0 : 1;
 
         //addPlayerButton.SetActive(localPlayerCount < maxPlayersPerConnection && PlayerNumber < maxPlayers);
+    }
+
+
+    public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
+    {
+        //This hook allows you to apply state data from the lobby-player to the game-player
+        //just subclass "LobbyHook" and add it to the lobby object.
+
+        if (_lobbyHook != null)
+            _lobbyHook.OnLobbyServerSceneLoadedForPlayer(this, lobbyPlayer, gamePlayer);
+
+        return true;
     }
 
     public void SetServerInfo(string status, string host)

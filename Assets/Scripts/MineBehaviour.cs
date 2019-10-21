@@ -25,8 +25,10 @@ public class MineBehaviour : NetworkBehaviour {
 
         if (entityCollider != null)
         {
-            entityCollider.GetComponentInParent<Rigidbody>().AddExplosionForce(50f, transform.position, 5f, 0f, ForceMode.Impulse);
-            entityCollider.GetComponentInParent<PlayerHealth>().TakeDamage(50, null);
+            //entityCollider.GetComponentInParent<Rigidbody>().AddExplosionForce(50f, transform.position, 5f, 0f, ForceMode.Impulse);
+            var entityHealth = entityCollider.GetComponentInParent<PlayerHealth>();
+            if (entityHealth != null)
+                entityHealth.TakeDamage(50, null);
         }
 
         Destroy(gameObject.transform.Find("Graphics").gameObject);

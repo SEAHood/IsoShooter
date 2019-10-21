@@ -5,24 +5,59 @@ using UnityEngine.Networking;
 
 public class PlayerMovement : NetworkBehaviour  {
 
-	public float Speed = 15f;
+	public float Speed;
 	public bool Enabled = true;
+    public float GravityScale;
+    public float JumpForce;
 
     public GameObject PlayerCamera;
+
+    private Vector3 _moveDirection = Vector3.zero;
+    private CharacterController _controller;
 
 	// Use this for initialization
 	void Start ()
 	{
 	    PlayerCamera.SetActive(isLocalPlayer);
+	    _controller = GetComponent<CharacterController>();
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-	    if (!isLocalPlayer) return; 
 	    if (!Enabled) return;
 
-        var dir = new Vector3();
+	    if (isLocalPlayer)
+	    {
+	        var previousY = _moveDirection.y;
+            //_moveDirection = new Vector3(Input.GetAxis("Horizontal") * Speed, _moveDirection.y, Input.GetAxis("Vertical") * Speed);
+            //_moveDirection = transform.TransformDirection(_moveDirection);
+            _moveDirection = new Vector3();
+	        if (Input.GetKey(KeyCode.W))
+	            _moveDirection += new Vector3(1, _moveDirection.y, 1);
+	        if (Input.GetKey(KeyCode.A))
+	            _moveDirection += new Vector3(-1, _moveDirection.y, 1);
+	        if (Input.GetKey(KeyCode.S))
+	            _moveDirection += new Vector3(-1, _moveDirection.y, -1);
+	        if (Input.GetKey(KeyCode.D))
+	            _moveDirection += new Vector3(1, _moveDirection.y, -1);
+            
+	        _moveDirection *= Speed;
+	        _moveDirection.y = previousY;
+
+            if (_controller.isGrounded && Input.GetButtonDown("Jump"))
+	        {
+	            _moveDirection.y = JumpForce;
+	        }
+
+        }
+
+	    _moveDirection.y = _moveDirection.y + (Physics.gravity.y * GravityScale) * Time.deltaTime;
+	    _controller.Move(_moveDirection * Time.deltaTime);
+
+        if (!isLocalPlayer) return; 
+
+        /*var dir = new Vector3();
 		if ( Input.GetKey(KeyCode.W) ) {
 			dir += new Vector3(1, 0, 1);
 		}
@@ -38,7 +73,8 @@ public class PlayerMovement : NetworkBehaviour  {
 
 	    var rb = GetComponent<Rigidbody>();
         var movement = dir.normalized * Speed * Time.deltaTime;
-        rb.AddForce(movement, ForceMode.VelocityChange);
+        rb.AddForce(movement, ForceMode.VelocityChange);*/
+
 
 		var plane = GameObject.Find("Ground");
 		var cPlane = plane.GetComponent<Collider>();

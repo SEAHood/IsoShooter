@@ -96,9 +96,6 @@ namespace TranslucentUI
 				screenWidth = Screen.width;
 				screenHeight = Screen.height;
 
-				// orientation is changed
-				blurRT.height = Screen.height;
-				blurRT.width = Screen.width;
 			}
 
 			if (blurOption == BlurOption.BlurBackground) 

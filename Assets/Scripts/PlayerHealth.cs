@@ -13,6 +13,7 @@ public class PlayerHealth : NetworkBehaviour
 
     private PlayerMovement _playerMovement;
     private PlayerShooting _playerShooting;
+    private Coroutine _deathCoroutine;
 
     [SyncVar(hook = "UpdateHealth")]
     public float _currentHealth;
@@ -103,12 +104,12 @@ public class PlayerHealth : NetworkBehaviour
     
     private IEnumerator DeathCoroutine()
     {
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        //GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
         transform.Find("FloatUI").gameObject.SetActive(false);
         yield return new WaitForSeconds(1.5f);
         Instantiate(DeathEffect, transform.position, DeathEffect.transform.rotation);
         GetComponent<BoxCollider>().enabled = false;
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+        //GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         transform.Find("Player").gameObject.SetActive(false);
     }
 
@@ -167,13 +168,14 @@ public class PlayerHealth : NetworkBehaviour
         _playerShooting.Enabled = !isNowDead;
 
         if (isNowDead)
-            StartCoroutine(DeathCoroutine());
+            _deathCoroutine = StartCoroutine(DeathCoroutine());
         else
         {
+            StopCoroutine(_deathCoroutine);
             transform.Find("Player").gameObject.SetActive(true);
             transform.Find("FloatUI").gameObject.SetActive(true);
             GetComponent<BoxCollider>().enabled = true;
-            GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            //GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         }
 
         if (isLocalPlayer)

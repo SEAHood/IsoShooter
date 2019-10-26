@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 81f4ce96b1d4ea9429d702550d707beb
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Bayu Prahara 2
+  fontNames:
+  - Bayu Prahara 2
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 56e20c224dd4f444c81cb1a83c44e0c5, type: 3}
+  - {fileID: 12800000, guid: 4a9b72d9c9c81a24bb1df1b1926b5812, type: 3}
+  - {fileID: 12800000, guid: 39a1e80f9818a32469a2ea65b34557da, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

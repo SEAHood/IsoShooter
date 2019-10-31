@@ -11,8 +11,8 @@ public class LobbyPlayer : NetworkLobbyPlayer
     static List<int> _colorInUse = new List<int>();
 
     //public Button ColorButton;
-    public Text NameText;
-    public Button ReadyButton;
+    //public Text NameText;
+    //public Button ReadyButton;
     //public Button WaitingPlayerButton;
     //public Button RemovePlayerButton;
 
@@ -20,10 +20,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
     //public GameObject RemoteIcone;
 
     //OnMyName function will be invoked on clients when server change the value of playerName
-    [SyncVar(hook = "OnMyName")]
-    public string PlayerName = "";
-    [SyncVar(hook = "OnMyColor")]
-    public Color PlayerColor = Color.white;
+    //[SyncVar(hook = "OnMyName")]
+    //public string PlayerName = "";
+    //[SyncVar(hook = "OnMyColor")]
+    //public Color PlayerColor = Color.white;
 
     public Color OddRowColor = new Color(250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f, 1.0f);
     public Color EvenRowColor = new Color(180.0f / 255.0f, 180.0f / 255.0f, 180.0f / 255.0f, 1.0f);
@@ -41,13 +41,13 @@ public class LobbyPlayer : NetworkLobbyPlayer
         base.OnClientEnterLobby();
 
 
-        if (LobbyManager.Singleton != null)
+        if (LobbyManager.Instance != null)
         {
-            LobbyManager.Singleton.SetServerInfo("Connected", LobbyManager.Singleton.networkAddress);
-            LobbyManager.Singleton.OnPlayersNumberModified(1);
+            //LobbyManager.Instance.SetServerInfo("Connected", LobbyManager.Instance.networkAddress);
+            LobbyManager.Instance.OnPlayersNumberModified(1);
         }
         LobbyPlayerList.Instance.AddPlayer(this);
-        LobbyPlayerList.Instance.DisplayDirectServerWarning(isServer && LobbyManager.Singleton.matchMaker == null);
+        LobbyPlayerList.Instance.DisplayDirectServerWarning(isServer && LobbyManager.Instance.matchMaker == null);
 
         if (isLocalPlayer)
         {
@@ -60,8 +60,8 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
         //setup the player data on UI. The value are SyncVar so the player
         //will be created with the right value currently on server
-        OnMyName(PlayerName);
-        OnMyColor(PlayerColor);
+       // OnMyName(PlayerName);
+        //OnMyColor(PlayerColor);
     }
 
     public override void OnStartAuthority()
@@ -74,7 +74,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
         SetupLocalPlayer();
     }
 
-    void ChangeReadyButtonColor(Color c)
+    /*void ChangeReadyButtonColor(Color c)
     {
         ColorBlock b = ReadyButton.colors;
         b.normalColor = c;
@@ -82,17 +82,17 @@ public class LobbyPlayer : NetworkLobbyPlayer
         b.highlightedColor = c;
         b.disabledColor = c;
         ReadyButton.colors = b;
-    }
+    }*/
 
     void SetupOtherPlayer()
     {
         //NameInput.interactable = false;
         //RemovePlayerButton.interactable = NetworkServer.active;
 
-        ChangeReadyButtonColor(_transparentColor);
+        //ChangeReadyButtonColor(_transparentColor);
 
         //ReadyButton.transform.GetChild(0).GetComponent<Text>().text = "...";
-        ReadyButton.interactable = false;
+        //ReadyButton.interactable = false;
 
         OnClientReady(false);
     }
@@ -109,10 +109,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //    CmdColorChange();
 
         //ChangeReadyButtonColor(_joinColor);
-        ChangeReadyButtonColor(_notReadyColor);
+        //ChangeReadyButtonColor(_notReadyColor);
 
         //ReadyButton.transform.GetChild(0).GetComponent<Text>().text = "JOIN";
-        ReadyButton.interactable = true;
+        //ReadyButton.interactable = true;
 
         //have to use child count of player prefab already setup as "this.slot" is not set yet
         //if (PlayerName == "")
@@ -128,14 +128,14 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //ColorButton.onClick.RemoveAllListeners();
         //ColorButton.onClick.AddListener(OnColorClicked);
 
-        CmdNameChanged(CrossScene.PlayerName);
+        //CmdNameChanged(CrossScene.PlayerName);
 
-        ReadyButton.onClick.RemoveAllListeners();
-        ReadyButton.onClick.AddListener(OnReadyClicked);
+        //ReadyButton.onClick.RemoveAllListeners();
+        //ReadyButton.onClick.AddListener(OnReadyClicked);
 
         //when OnClientEnterLobby is called, the loval PlayerController is not yet created, so we need to redo that here to disable
         //the add button if we reach maxLocalPlayer. We pass 0, as it was already counted on OnClientEnterLobby
-        if (LobbyManager.Singleton != null) LobbyManager.Singleton.OnPlayersNumberModified(0);
+        if (LobbyManager.Instance != null) LobbyManager.Instance.OnPlayersNumberModified(0);
     }
 
     //This enable/disable the remove button depending on if that is the only local player or not
@@ -156,24 +156,24 @@ public class LobbyPlayer : NetworkLobbyPlayer
         if (readyState)
         {
             //ChangeReadyButtonColor(_transparentColor);
-            ChangeReadyButtonColor(_readyColor);
+            //ChangeReadyButtonColor(_readyColor);
 
             //Text textComponent = ReadyButton.transform.GetChild(0).GetComponent<Text>();
             //textComponent.text = "READY";
            // textComponent.color = _readyColor;
-            ReadyButton.interactable = false;
+            //ReadyButton.interactable = false;
             //ColorButton.interactable = false;
             //NameInput.interactable = false;
         }
         else
         {
-            ChangeReadyButtonColor(isLocalPlayer ? _notReadyColor : _transparentColor);
+            //ChangeReadyButtonColor(isLocalPlayer ? _notReadyColor : _transparentColor);
             //ChangeReadyButtonColor(_notReadyColor);
 
             //Text textComponent = ReadyButton.transform.GetChild(0).GetComponent<Text>();
             //textComponent.text = isLocalPlayer ? "JOIN" : "...";
             //textComponent.color = Color.white;
-            ReadyButton.interactable = isLocalPlayer;
+            //ReadyButton.interactable = isLocalPlayer;
             //ColorButton.interactable = isLocalPlayer;
             //NameInput.interactable = isLocalPlayer;
         }
@@ -186,10 +186,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
     ///===== callback from sync var
 
-    public void OnMyName(string newName)
+    /*public void OnMyName(string newName)
     {
-        PlayerName = newName;
-        NameText.text = PlayerName;
+        //PlayerName = newName;
+        //NameText.text = PlayerName;
     }
 
     public void OnMyColor(Color newColor)
@@ -197,7 +197,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
         PlayerColor = newColor;
         NameText.color = newColor;
         //ColorButton.GetComponent<Image>().color = newColor;
-    }
+    }*/
 
     //===== UI Handler
 
@@ -205,7 +205,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
     //so that all client get the new value throught syncvar
     public void OnColorClicked()
     {
-        CmdColorChange();
+        //CmdColorChange();
     }
 
     public void OnReadyClicked()
@@ -215,7 +215,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
     public void OnNameChanged(string str)
     {
-        CmdNameChanged(str);
+        //CmdNameChanged(str);
     }
 
     /*public void OnRemovePlayerClick()
@@ -225,21 +225,21 @@ public class LobbyPlayer : NetworkLobbyPlayer
             RemovePlayer();
         }
         else if (isServer)
-            LobbyManager.Singleton.KickPlayer(connectionToClient);
+            LobbyManager.Instance.KickPlayer(connectionToClient);
 
     }*/
 
     public void ToggleJoinButton(bool enabled)
     {
-        ReadyButton.gameObject.SetActive(enabled);
+        //ReadyButton.gameObject.SetActive(enabled);
         //WaitingPlayerButton.gameObject.SetActive(!enabled);
     }
 
     [ClientRpc]
     public void RpcUpdateCountdown(int countdown)
     {
-        //LobbyManager.Singleton.countdownPanel.UIText.text = "Match Starting in " + countdown;
-        //LobbyManager.Singleton.countdownPanel.gameObject.SetActive(countdown != 0);
+        //LobbyManager.Instance.countdownPanel.UIText.text = "Match Starting in " + countdown;
+        //LobbyManager.Instance.countdownPanel.gameObject.SetActive(countdown != 0);
     }
 
     [ClientRpc]
@@ -250,7 +250,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
     //====== Server Command
 
-    [Command]
+    /*[Command]
     public void CmdColorChange()
     {
         int idx = System.Array.IndexOf(_colors, PlayerColor);
@@ -287,21 +287,26 @@ public class LobbyPlayer : NetworkLobbyPlayer
         }
 
         PlayerColor = _colors[idx];
-    }
+    }*/
+/*
 
     [Command]
     public void CmdNameChanged(string name)
     {
         PlayerName = name;
     }
+*/
 
     //Cleanup thing when get destroy (which happen when client kick or disconnect)
     public void OnDestroy()
     {
-        LobbyPlayerList.Instance.RemovePlayer(this);
-        if (LobbyManager.Singleton != null) LobbyManager.Singleton.OnPlayersNumberModified(-1);
+        // remove player from list of players
 
-        int idx = System.Array.IndexOf(_colors, PlayerColor);
+
+        LobbyPlayerList.Instance.RemovePlayer(this);
+        if (LobbyManager.Instance != null) LobbyManager.Instance.OnPlayersNumberModified(-1);
+
+        /*int idx = System.Array.IndexOf(_colors, PlayerColor);
 
         if (idx < 0)
             return;
@@ -313,6 +318,6 @@ public class LobbyPlayer : NetworkLobbyPlayer
                 _colorInUse.RemoveAt(i);
                 break;
             }
-        }
+        }*/
     }
 }

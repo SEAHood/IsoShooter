@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts;
+using Assets.Scripts.Helpers;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -8,12 +11,10 @@ using UnityEngine.UI;
 
 public class LobbyManager : NetworkLobbyManager
 {
-    public GameObject LobbyUi;
-
     private bool _lobbyConnected;
     private bool _hostStarted;
 
-    public static LobbyManager Singleton;
+    public static LobbyManager Instance;
 
     public Text StatusInfo;
     public Text HostInfo;
@@ -34,10 +35,10 @@ public class LobbyManager : NetworkLobbyManager
     void Start()
     {
         _lobbyHook = GetComponent<LobbyHook>();
-        Singleton = this;
+        Instance = this;
         CurrentPanel = MainMenuPanel;
         DontDestroyOnLoad(gameObject);
-        SetServerInfo("Offline", "None");
+        //SetServerInfo("Offline", "None");
     }
 
     // Update is called once per frame
@@ -52,19 +53,35 @@ public class LobbyManager : NetworkLobbyManager
         }*/
     }
 
-    public void JoinGame()
+    public void JoinGame(LobbyDto lobby)
     {
-
+        networkAddress = lobby.ip;
+        networkAddress = "localhost";
+        Debug.Log("Attempting to connect to " + networkAddress);
+        StartClient();
     }
 
     public void HostGame()
     {
         if (_hostStarted) return;
+        // TODO Try..catch
         StartHost();
+        // TODO Try..catch
+        StartCoroutine(Api.CreateLobby($"somelobby{Guid.NewGuid().ToString().Substring(0, 4)}", lobby => { }, error => { }));
         _hostStarted = true;
     }
 
+    public override void OnClientConnect(NetworkConnection conn)
+    {
+        base.OnClientConnect(conn);
+        Debug.Log("Connected to " + conn.address);
+    }
 
+    public override void OnClientError(NetworkConnection conn, int errorCode)
+    {
+        base.OnClientError(conn, errorCode);
+        Debug.Log("Error on " + conn.address + ": " + errorCode);
+    }
     /*public override void OnLobbyStartHost()
     {
         LobbyUI.SetActive(true);
@@ -78,10 +95,11 @@ public class LobbyManager : NetworkLobbyManager
         base.OnStartHost();
         Debug.Log("OnStartHost");
 
-        ChangeTo(LobbyPanel);
+        MenuUi.Instance.SwitchToLobby();
+
         AddLocalPlayer();
         //backDelegate = StopHostClbk;
-        SetServerInfo("Hosting", networkAddress);
+        //SetServerInfo("Hosting", networkAddress);
     }
     
     public void AddLocalPlayer()
@@ -92,6 +110,7 @@ public class LobbyManager : NetworkLobbyManager
     //allow to handle the (+) button to add/remove player
     public void OnPlayersNumberModified(int count)
     {
+        Debug.Log("OnPlayersNumberModified");
         PlayerNumber += count;
 
         var localPlayerCount = 0;
@@ -104,6 +123,7 @@ public class LobbyManager : NetworkLobbyManager
 
     public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
     {
+        Debug.Log("OnLobbyServerSceneLoadedForPlayer");
         //This hook allows you to apply state data from the lobby-player to the game-player
         //just subclass "LobbyHook" and add it to the lobby object.
 
@@ -111,12 +131,6 @@ public class LobbyManager : NetworkLobbyManager
             _lobbyHook.OnLobbyServerSceneLoadedForPlayer(this, lobbyPlayer, gamePlayer);
 
         return true;
-    }
-
-    public void SetServerInfo(string status, string host)
-    {
-        StatusInfo.text = status;
-        HostInfo.text = host;
     }
 
     public void ChangeTo(RectTransform newPanel)
@@ -157,7 +171,8 @@ public class LobbyManager : NetworkLobbyManager
 
     public override void OnLobbyClientSceneChanged(NetworkConnection conn)
     {
-        if (SceneManager.GetSceneAt(0).name == lobbyScene)
+        Debug.Log("OnLobbyClientSceneChanged");
+        /*if (SceneManager.GetSceneAt(0).name == lobbyScene)
         {
             ChangeTo(MainMenuPanel);
         }
@@ -166,14 +181,16 @@ public class LobbyManager : NetworkLobbyManager
             ChangeTo(null);
 
             //Destroy(GameObject.Find("MainMenuUI(Clone)"));
-        }
+        }*/
     }
 
     public override GameObject OnLobbyServerCreateLobbyPlayer(NetworkConnection conn, short playerControllerId)
     {
+        Debug.Log("OnLobbyServerCreateLobbyPlayer");
+        //MenuUi.OnNewLobbyPlayer();
         var obj = Instantiate(lobbyPlayerPrefab.gameObject);
 
-        var newPlayer = obj.GetComponent<LobbyPlayer>();
+        /*var newPlayer = obj.GetComponent<LobbyPlayer>();
         //newPlayer.ToggleJoinButton(numPlayers + 1 >= minPlayers);
         newPlayer.ToggleJoinButton(true);
 
@@ -188,7 +205,25 @@ public class LobbyManager : NetworkLobbyManager
                 p.ToggleJoinButton(numPlayers + 1 >= minPlayers);
             }
         }
+        */
 
         return obj;
+    }
+
+
+
+    static bool WantsToQuit()
+    {
+        if (Instance == null) return true;
+
+        Instance.StartCoroutine(Api.ClearLobby(Application.Quit));
+        return false;
+    }
+
+    [RuntimeInitializeOnLoadMethod]
+    static void RunOnStart()
+    {
+        Application.wantsToQuit += WantsToQuit;
+        EditorApplication.wantsToQuit += WantsToQuit;
     }
 }

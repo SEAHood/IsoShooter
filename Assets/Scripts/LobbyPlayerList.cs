@@ -18,17 +18,16 @@ public class LobbyPlayerList : MonoBehaviour
 
     public static LobbyPlayerList Instance = null;
 
-    public RectTransform PlayerListContentTransform;
     //public GameObject WarningDirectPlayServer;
     //public Transform AddButtonRow;
 
-    protected VerticalLayoutGroup Layout;
+    //protected VerticalLayoutGroup Layout;
     protected List<LobbyPlayer> Players = new List<LobbyPlayer>();
 
     public void OnEnable()
     {
         Instance = this;
-        Layout = PlayerListContentTransform.GetComponent<VerticalLayoutGroup>();
+        //Layout = PlayerListContentTransform.GetComponent<VerticalLayoutGroup>();
     }
 
     public void DisplayDirectServerWarning(bool enabled)
@@ -54,7 +53,7 @@ public class LobbyPlayerList : MonoBehaviour
 
         Players.Add(player);
         //player.PlayerName = Guid.NewGuid().ToString().Substring(0, 5);
-        player.transform.SetParent(PlayerListContentTransform, false);
+        player.transform.SetParent(transform, false);
 
         //AddButtonRow.transform.SetAsLastSibling();
         //var row = Instantiate(PlayerRowPrefab, PlayerListContentTransform);
@@ -72,6 +71,7 @@ public class LobbyPlayerList : MonoBehaviour
 
     public void PlayerListModified()
     {
+        Debug.Log("PlayerListModified");
         int i = 0;
         foreach (LobbyPlayer p in Players)
         {

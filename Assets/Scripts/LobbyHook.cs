@@ -10,7 +10,7 @@ namespace Assets.Scripts
             var lobby = lobbyPlayer.GetComponent<LobbyPlayer>();
             var player = gamePlayer.GetComponent<Player>();
 
-            player.PlayerName = lobby.PlayerName;
+            //player.PlayerName = lobby.PlayerName;
         }
     }
 }

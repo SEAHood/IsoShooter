@@ -28,6 +28,6 @@ public class JoinMenu : MonoBehaviour {
         Manager.ChangeTo(LobbyPanel);
         Manager.networkAddress = IpInput.text;
         Manager.StartClient();
-        Manager.SetServerInfo("Connecting...", Manager.networkAddress);
+        //Manager.SetServerInfo("Connecting...", Manager.networkAddress);
     }
 }

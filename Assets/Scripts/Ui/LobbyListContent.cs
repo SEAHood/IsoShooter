@@ -20,7 +20,7 @@ public class LobbyListContent : MonoBehaviour
     public GameObject LobbyListRow;
     public GameObject EmptyContent;
     public GameObject LoadingContent;
-    public LobbyDetails LobbyDetails;
+    public JoinLobbyDetails JoinLobbyDetails;
 
     private LobbyDto _selectedLobby;
 
@@ -70,7 +70,7 @@ public class LobbyListContent : MonoBehaviour
     public void LobbySelected(LobbyDto lobby)
     {
         _selectedLobby = lobby;
-        LobbyDetails.Populate(lobby);
+        JoinLobbyDetails.Populate(lobby);
     }
 
     public LobbyDto GetSelectedLobby()

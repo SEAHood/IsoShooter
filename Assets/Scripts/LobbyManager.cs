@@ -34,6 +34,7 @@ public class LobbyManager : NetworkLobbyManager
     // Use this for initialization
     void Start()
     {
+        
         _lobbyHook = GetComponent<LobbyHook>();
         Instance = this;
         CurrentPanel = MainMenuPanel;
@@ -95,7 +96,6 @@ public class LobbyManager : NetworkLobbyManager
         base.OnStartHost();
         Debug.Log("OnStartHost");
 
-        MenuUi.Instance.SwitchToLobby();
 
         AddLocalPlayer();
         //backDelegate = StopHostClbk;
@@ -224,6 +224,7 @@ public class LobbyManager : NetworkLobbyManager
     static void RunOnStart()
     {
         Application.wantsToQuit += WantsToQuit;
-        EditorApplication.wantsToQuit += WantsToQuit;
+
+        //EditorApplication.wantsToQuit += WantsToQuit;
     }
 }

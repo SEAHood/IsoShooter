@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MenuUi : MonoBehaviour
 {
@@ -35,22 +33,33 @@ public class MenuUi : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2))
             SwitchToHost();
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-            SwitchToLobby();
     }
+
+
+
+
 
     // UI Hooks
     // ReSharper disable UnusedMember.Global
     public void HostGameClicked()
     {
+        var lobby = new LobbyDto
+        {
+            name = "Test lobby",
+            maxPlayers = 8,
+            players = 1,
+            ip = "localhost",
+            map = "test_map"
+        };
         LobbyManager.Instance.HostGame();
-        SwitchToLobby();
+        SwitchToLobby(lobby);
     }
 
     public void JoinGameClicked()
     {
-        LobbyManager.Instance.JoinGame(_lobbyList.GetSelectedLobby());
-        SwitchToLobby();
+        var lobby = _lobbyList.GetSelectedLobby();
+        LobbyManager.Instance.JoinGame(lobby);
+        SwitchToLobby(lobby);
     }
     // ReSharper enable UnusedMember.Global
     // UI Hooks
@@ -68,10 +77,11 @@ public class MenuUi : MonoBehaviour
         }
     }
     
-    public void SwitchToLobby()
+    public void SwitchToLobby(LobbyDto lobby)
     {
         DisableAllPanels();
         _lobbyPanel.SetActive(true);
+        _lobbyPanel.GetComponent<LobbyUi>().PopulateDetails(lobby);
     }
 
     public void SwitchToJoin()

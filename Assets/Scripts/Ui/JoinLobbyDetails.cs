@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class LobbyDetails : NetworkBehaviour
+public class JoinLobbyDetails : MonoBehaviour
 {
     public GameObject EmptyContent;
 
@@ -30,20 +29,11 @@ public class LobbyDetails : NetworkBehaviour
         _lobbyName.text = lobby.name;
         _lobbyPlayers.text = $"{lobby.players}/{lobby.maxPlayers}";
         _lobbyMap.text = lobby.map;
-
-        if (isServer)
-        {
-            _lobbyName.text += " (host)";
-        }
-        else
-        {
-            _lobbyName.text += " (client)";
-        }
     }
 
     public void ResetPanel()
     {
-        gameObject.SetActive(true);
-        //EmptyContent.SetActive(true);
+        gameObject.SetActive(false);
+        EmptyContent.SetActive(true);
     }
 }

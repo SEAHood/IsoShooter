@@ -71,6 +71,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //if we return from a game, color of text can still be the one for "Ready"
         //ReadyButton.transform.GetChild(0).GetComponent<Text>().color = Color.white;
 
+
+        var lobbyDetails = GameObject.Find("LobbyDetails").GetComponent<LobbyDetails>();
+        lobbyDetails.SetHost(isServer);
+
         SetupLocalPlayer();
     }
 

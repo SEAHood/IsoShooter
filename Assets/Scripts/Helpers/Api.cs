@@ -109,17 +109,14 @@ namespace Assets.Scripts.Helpers
             }
         }
 
-        public static IEnumerator ClearLobby(Action callback)
+        public static void ClearLobby()
         {
             Debug.Log("Clearing lobby");
             var request = new UnityWebRequest(LobbiesUrl)
             {
                 method = UnityWebRequest.kHttpVerbDELETE
             };
-
-            yield return request.SendWebRequest();
-
-            callback();
+            request.SendWebRequest();
         }
     }
 

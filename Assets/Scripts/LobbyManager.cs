@@ -23,18 +23,24 @@ public class LobbyManager : NetworkLobbyManager
     public RectTransform LobbyPanel;
     protected RectTransform CurrentPanel;
 
+    public LobbyDetails LobbyDetails;
     private LobbyHook _lobbyHook;
 
     //Client numPlayers from NetworkManager is always 0, so we count (throught connect/destroy in LobbyPlayer) the number
     //of players, so that even client know how many player there is.
     [HideInInspector]
-    public int PlayerNumber = 0;
+    public int PlayerCount = 0;
 
+    void Awake()
+    {
+        Instance = this;
+    }
 
     // Use this for initialization
     void Start()
     {
-        
+        //LobbyDetails = Resources.FindObjectsOfTypeAll<LobbyDetails>()[0];
+        //LobbyDetails = GameObject.Find("LobbyDetails").GetComponent<LobbyDetails>();
         _lobbyHook = GetComponent<LobbyHook>();
         Instance = this;
         CurrentPanel = MainMenuPanel;
@@ -70,6 +76,8 @@ public class LobbyManager : NetworkLobbyManager
         // TODO Try..catch
         StartCoroutine(Api.CreateLobby($"somelobby{Guid.NewGuid().ToString().Substring(0, 4)}", lobby => { }, error => { }));
         _hostStarted = true;
+
+
     }
 
     public override void OnClientConnect(NetworkConnection conn)
@@ -111,13 +119,14 @@ public class LobbyManager : NetworkLobbyManager
     public void OnPlayersNumberModified(int count)
     {
         Debug.Log("OnPlayersNumberModified");
-        PlayerNumber += count;
+        PlayerCount += count;
 
         var localPlayerCount = 0;
         foreach (PlayerController p in ClientScene.localPlayers)
             localPlayerCount += (p == null || p.playerControllerId == -1) ? 0 : 1;
 
-        //addPlayerButton.SetActive(localPlayerCount < maxPlayersPerConnection && PlayerNumber < maxPlayers);
+        LobbyDetails.UpdatePlayerCount(PlayerCount);
+        //addPlayerButton.SetActive(localPlayerCount < maxPlayersPerConnection && PlayerCount < maxPlayers);
     }
 
 
@@ -215,15 +224,14 @@ public class LobbyManager : NetworkLobbyManager
     static bool WantsToQuit()
     {
         if (Instance == null) return true;
-
-        Instance.StartCoroutine(Api.ClearLobby(Application.Quit));
-        return false;
+        Api.ClearLobby();
+        return true;
     }
 
     [RuntimeInitializeOnLoadMethod]
     static void RunOnStart()
     {
-        Application.wantsToQuit += WantsToQuit;
+        //Application.wantsToQuit += WantsToQuit;
 
         //EditorApplication.wantsToQuit += WantsToQuit;
     }

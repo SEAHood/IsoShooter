@@ -1,16 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class LobbyDetails : NetworkBehaviour
+public class LobbyDetails : MonoBehaviour
 {
     public GameObject EmptyContent;
 
     private Text _lobbyName;
     private Text _lobbyPlayers;
     private Text _lobbyMap;
+
+    private bool _isHost;
 
     void Awake()
     {
@@ -21,6 +24,18 @@ public class LobbyDetails : NetworkBehaviour
         ResetPanel();
     }
 
+    public void SetHost(bool host)
+    {
+        _isHost = host;
+        //_lobbyName.text += host ? " (host)" : " (client)"; 
+    }
+
+    public void UpdatePlayerCount(int localPlayerCount)
+    {
+        _lobbyName = transform.Find("LobbyName").GetComponent<Text>();
+        _lobbyName.text = _isHost ? "HOST (" : "CLIENT (";
+        _lobbyName.text += localPlayerCount + ")";
+    }
 
     public void Populate(LobbyDto lobby)
     {
@@ -31,14 +46,6 @@ public class LobbyDetails : NetworkBehaviour
         _lobbyPlayers.text = $"{lobby.players}/{lobby.maxPlayers}";
         _lobbyMap.text = lobby.map;
 
-        if (isServer)
-        {
-            _lobbyName.text += " (host)";
-        }
-        else
-        {
-            _lobbyName.text += " (client)";
-        }
     }
 
     public void ResetPanel()

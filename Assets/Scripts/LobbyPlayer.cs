@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -20,8 +21,8 @@ public class LobbyPlayer : NetworkLobbyPlayer
     //public GameObject RemoteIcone;
 
     //OnMyName function will be invoked on clients when server change the value of playerName
-    //[SyncVar(hook = "OnMyName")]
-    //public string PlayerName = "";
+    [SyncVar(hook = "OnMyName")]
+    public string PlayerName = "sumcunt" + Guid.NewGuid().ToString().Substring(0, 4);
     //[SyncVar(hook = "OnMyColor")]
     //public Color PlayerColor = Color.white;
 
@@ -60,7 +61,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
         //setup the player data on UI. The value are SyncVar so the player
         //will be created with the right value currently on server
-       // OnMyName(PlayerName);
+        OnMyName(PlayerName);
         //OnMyColor(PlayerColor);
     }
 
@@ -135,7 +136,7 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //CmdNameChanged(CrossScene.PlayerName);
 
         //ReadyButton.onClick.RemoveAllListeners();
-        //ReadyButton.onClick.AddListener(OnReadyClicked);
+        //ReadyButton.onClick.AddListener(RpcReady);
 
         //when OnClientEnterLobby is called, the loval PlayerController is not yet created, so we need to redo that here to disable
         //the add button if we reach maxLocalPlayer. We pass 0, as it was already counted on OnClientEnterLobby
@@ -190,18 +191,10 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
     ///===== callback from sync var
 
-    /*public void OnMyName(string newName)
+    public void OnMyName(string newName)
     {
-        //PlayerName = newName;
-        //NameText.text = PlayerName;
+        PlayerName = newName;
     }
-
-    public void OnMyColor(Color newColor)
-    {
-        PlayerColor = newColor;
-        NameText.color = newColor;
-        //ColorButton.GetComponent<Image>().color = newColor;
-    }*/
 
     //===== UI Handler
 
@@ -212,15 +205,17 @@ public class LobbyPlayer : NetworkLobbyPlayer
         //CmdColorChange();
     }
 
-    public void OnReadyClicked()
+    [ClientRpc]
+    public void RpcReady()
     {
         SendReadyToBeginMessage();
     }
 
     public void OnNameChanged(string str)
     {
-        //CmdNameChanged(str);
+        CmdNameChanged(str);
     }
+
 
     /*public void OnRemovePlayerClick()
     {
@@ -292,14 +287,14 @@ public class LobbyPlayer : NetworkLobbyPlayer
 
         PlayerColor = _colors[idx];
     }*/
-/*
+
 
     [Command]
     public void CmdNameChanged(string name)
     {
         PlayerName = name;
     }
-*/
+
 
     //Cleanup thing when get destroy (which happen when client kick or disconnect)
     public void OnDestroy()

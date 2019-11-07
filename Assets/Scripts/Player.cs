@@ -7,7 +7,7 @@ public class Player : NetworkBehaviour
 {
     [HideInInspector]
     [SyncVar]
-    public string PlayerName;
+    public string PlayerName = "";
 
     public Text PlayerNameText;
 

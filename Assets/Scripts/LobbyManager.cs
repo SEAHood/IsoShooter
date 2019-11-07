@@ -80,7 +80,7 @@ public class LobbyManager : NetworkLobbyManager
 
     }
 
-    public override void OnClientConnect(NetworkConnection conn)
+    /*public override void OnClientConnect(NetworkConnection conn)
     {
         base.OnClientConnect(conn);
         Debug.Log("Connected to " + conn.address);
@@ -90,7 +90,7 @@ public class LobbyManager : NetworkLobbyManager
     {
         base.OnClientError(conn, errorCode);
         Debug.Log("Error on " + conn.address + ": " + errorCode);
-    }
+    }*/
     /*public override void OnLobbyStartHost()
     {
         LobbyUI.SetActive(true);
@@ -102,6 +102,8 @@ public class LobbyManager : NetworkLobbyManager
     public override void OnStartHost()
     {
         base.OnStartHost();
+
+
         Debug.Log("OnStartHost");
 
 
@@ -129,6 +131,11 @@ public class LobbyManager : NetworkLobbyManager
         //addPlayerButton.SetActive(localPlayerCount < maxPlayersPerConnection && PlayerCount < maxPlayers);
     }
 
+
+    public override void OnServerSceneChanged(string sceneName)
+    {
+        base.OnServerSceneChanged(sceneName);
+    }
 
     public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
     {
@@ -168,33 +175,48 @@ public class LobbyManager : NetworkLobbyManager
         }*/
     }
 
+    public void StartGame()
+    {
+        // FORCE READY - TODO: Implement ready check
+        foreach (var t in lobbySlots)
+        {
+            var p = t as LobbyPlayer;
+            if (p != null) p.RpcReady();
+        }
+
+        //ServerChangeScene(playScene);
+    }
 
     public override void OnLobbyServerPlayersReady()
     {
+        base.OnLobbyServerPlayersReady();
         //ChangeTo(null);
         //transform.Find("UI").gameObject.SetActive(false);
         Debug.Log("Everyone ready!");
-        base.OnLobbyServerPlayersReady();
 
     }
 
     public override void OnLobbyClientSceneChanged(NetworkConnection conn)
     {
+        base.OnLobbyClientSceneChanged(conn);
         Debug.Log("OnLobbyClientSceneChanged");
-        /*if (SceneManager.GetSceneAt(0).name == lobbyScene)
+        if (SceneManager.GetSceneAt(0).name == lobbyScene)
         {
-            ChangeTo(MainMenuPanel);
+            MenuUi.Instance.Show();
+            //ChangeTo(MainMenuPanel);
         }
         else
         {
-            ChangeTo(null);
+            MenuUi.Instance.Hide();
+            //ChangeTo(null);
 
             //Destroy(GameObject.Find("MainMenuUI(Clone)"));
-        }*/
+        }
     }
 
     public override GameObject OnLobbyServerCreateLobbyPlayer(NetworkConnection conn, short playerControllerId)
     {
+        base.OnLobbyServerCreateLobbyPlayer(conn, playerControllerId);
         Debug.Log("OnLobbyServerCreateLobbyPlayer");
         //MenuUi.OnNewLobbyPlayer();
         var obj = Instantiate(lobbyPlayerPrefab.gameObject);
